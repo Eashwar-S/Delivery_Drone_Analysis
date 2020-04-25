@@ -11,19 +11,18 @@ k = 2000; % number of Monte Carlo trials
 BinSz = 10; % bin size of histogram of drone cost
 manfCost = 2; % manufacturing cost 
 transCost = 3; % transportation cost
-
 DroneCost = zeros(1,k);  % Monte Carlo drone cost for design 1
 for i = 1:k
-    frameCost = random(frame_cost); % per unit cost of drone frame
-    battCost = random(batt_cost); % per unit cost of battery
-    motorCost = random(motor_cost); % per unit cost of electric motor
-    escCost = random(ESC_cost); % per unit cost of electric speed controller
-    propCost = random(prop_cost); % per unit cost of propeller
-    mcCost = random(MC_cost); % per unit cost of microcontroller
-    flcCost = random(FLC_cost); % per unit cost of flight controller
-    vsCost = random(VS_cost); % per unit cost of vision system
-    navCost = random(nav_cost); % per unit cost of navigation system
-    commCost = random(comm_cost); % per unit cost of communication system
+    frameCost = random(frame_cost); % cost of drone frame
+    battCost = random(batt_cost); 
+    motorCost = random(motor_cost);
+    escCost = random(ESC_cost);
+    propCost = random(prop_cost);
+    mcCost = random(MC_cost);
+    flcCost = random(FLC_cost);
+    vsCost = random(VS_cost);
+    navCost = random(nav_cost);
+    commCost = random(comm_cost);
     % calculate unit drone cost
     DroneCost(i) = frameCost + battCost + motorCost + escCost + propCost + ...
      + mcCost + flcCost + vsCost + navCost + commCost + manfCost + transCost;
