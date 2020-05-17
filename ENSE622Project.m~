@@ -4,24 +4,78 @@
 % Author - Oghenetekevwe Akoroda
 % Submitted 05/11/2020
 
+clear; clc; close all
+% Drone components Weight table
+Component = {'Drone frame';'Propeller';'Motor';'Battery';'Navigation System'...
+    ;'Electronic Speed Controller';'Microcontroller';'Flight Controller' ...
+    ;'Communication System';'Vision System'};
+Design1_Weight = [460,7.7*4,83.63*4,230,0,2,1.541,7.6,0,0]; % Weight in grams
+Design2_Weight = [460,7.7*4,83.63*4,330,0,6.9,1.541,7.6,0,0];
+Design3_Weight = [460,7.7*4,83.63*4,330,0,14.4,1.541,7.4,0,0];
+Design4_Weight = [460,7.7*4,83.63*4,230,0,14.4,0.657,7.4,0,0];
+
+CompWeights = table(Component,Design1_Weight,Design2_Weight,Design3_Weight  ...
+ ,Design4_Weight);
+
+DroneWeight = [sum(CompWeights.Design1_Weight),sum(CompWeights.Design2_Weight) ...
+    ,sum(CompWeights.Design3_Weight),sum(CompWeights.Design4_Weight)];
+
+BattCap = [2.2,3.2,3.2,2.2]; % battery capacity(Ah) of designs 1 - 4
+
+% Response Equations 
+
+Cq = 0.002; % torque coefficient
+% single motor Torque, Q(N-m) = Aq*w^2 where w is angular speed(rpm)
+Aq = (0.5*Cq*1.2*0.1016^5*pi);
+
+Ct = 0.016; % thrust coefficient
+% drone Thrust, T(N) = At*w^2 where w is angular speed(rpm)
+At = (0.5*Ct*1.2*0.1016^4*pi)*4;  % 4 is for 4 motors
+Cd = 0.04; % drag coefficient Drag = 0.5*Cd*1.2*A*V^2 where v is drone speed
+
+Atop = pi*0.45^2/4; % top area of the drone
+Afront = (0.45/2)*0.11; % front area of the drone
+Q0 = 0.9; % stall torque (N-m) at rated voltage
+w_nl = 3500; % no load speed (rpm) at rated voltage
+i_nl = 3; % no load current(A)
+Qcons = 0.04; % torque constant (change in torque/change in current)
+
+wmax = (-(Q0/w_nl)+sqrt((Q0/w_nl)^2 + 4*Aq*Q0))/(2*Aq); % maximum rotational speed
+Tmax = At*wmax^2; % maximum torque 
+
+% DroneWeight is a vector containing the drone weight for the four designs.
+
+% rated lifting capacity, LiftCap (in N)
+LiftCap = (Tmax/2) - DroneWeight; %thrust-to-weight ratio of 2
+
+% maximum speed, Vmax (in m/s)
+A = (Atop*sqrt(Tmax^2 - DroneWeight.^2) + Afront*DroneWeight)/Tmax; % drone frontal area
+Vmax = sqrt(2./(Cd*1.2*A)) .* (Tmax^2 - DroneWeight.^2).^0.25;
+
+% maximum flight time (rated at 3 m/s), Ftmax (in hour)
+
+% current drawn by motor at maximum flight time condition
+imaxft = (sqrt(DroneWeight.^2 + 0.6*Cd*A*3^2)*Aq/At)/Qcons + i_nl;
+Ftmax = BattCap/imaxft; 
+
 % Monte Carlo simulation
 
 k = 2000; % number of Monte Carlo trials
 
 DroneCost = zeros(1,k);  % Monte Carlo drone cost for design 1
 for i = 1:k
-    frameCost = random3(frame_cost); % per unit cost of drone frame
-    battCost = random3(batt_cost); % per unit cost of battery
-    motorCost = random3(motor_cost); % per unit cost of electric motor
-    escCost = random3(ESC_cost); % per unit cost of electric speed controller
-    propCost = random3(prop_cost); % per unit cost of propeller
-    mcCost = random3(MC_cost); % per unit cost of microcontroller
+    frameCost = random3([28.78,46.89,145.99,0.35,0.5]); % per unit cost of drone frame
+    battCost = random3([39.99,59.99,109.99,0.3,0.5]); % per unit cost of battery
+    motorCost = random3([44.99,104.00,199.99,0.3,0.55]); % per unit cost of electric motor
+    escCost = random3([16.99,19.99,23.99,0.35,0.4]); % per unit cost of electric speed controller
+    propCost = random3([3.99,5.69,14.99,0.35,0.45]); % per unit cost of propeller
+    mcCost = random3([9.99,13.00,15.00,0.35,0.4]); % per unit cost of microcontroller
     flcCost = random3(FLC_cost); % per unit cost of flight controller
     vsCost = random3(VS_cost); % per unit cost of vision system
     navCost = random3(nav_cost); % per unit cost of navigation system
     commCost = random3(comm_cost); % per unit cost of communication system
     % calculate unit drone cost
-    DroneCost(i) = frameCost + battCost + motorCost + escCost + propCost + ...
+    DroneCost(i) = frameCost + battCost + 4*motorCost + escCost + 4*propCost + ...
      + mcCost + flcCost + vsCost + navCost + commCost;
 end
 AveDroneCost = mean(DroneCost); % Average drone design 1 cost
@@ -29,18 +83,18 @@ AveDroneCost = mean(DroneCost); % Average drone design 1 cost
 
 DroneCost2 = zeros(1,k);  % Monte Carlo drone cost for design 2
 for i = 1:k
-    frameCost = random3(frame_cost2);
-    battCost = random3(batt_cost2);
-    motorCost = random3(motor_cost2);
-    escCost = random3(ESC_cost2);
-    propCost = random3(prop_cost2);
-    mcCost = random3(MC_cost2);
+    frameCost = random3([28.78,46.89,145.99,0.35,0.5]);
+    battCost = random3([59.99,79.99,109.99,0.3,0.5]);
+    motorCost = random3([44.99,104.00,199.99,0.3,0.55]);
+    escCost = random3([23.69,29.69,32.99,0.3,0.4]);
+    propCost = random3([3.99,5.69,14.99,0.35,0.45]);
+    mcCost = random3([9.99,13.00,15.00,0.35,0.4]);
     flcCost = random3(FLC_cost2);
     vsCost = random3(VS_cost2);
     navCost = random3(nav_cost2);
     commCost = random3(comm_cost2);
     % calculate unit drone cost
-    DroneCost2(i) = frameCost + battCost + motorCost + escCost + propCost + ...
+    DroneCost2(i) = frameCost + battCost + 4*motorCost + escCost + 4*propCost + ...
      + mcCost + flcCost + vsCost + navCost + commCost;
 end
 
@@ -48,18 +102,18 @@ AveDroneCost2 = mean(DroneCost2); % Average drone design 2 cost
 
 DroneCost3 = zeros(1,k);  % Monte Carlo drone cost for design 3
 for i = 1:k
-    frameCost = random3(frame_cost3);
-    battCost = random3(batt_cost3);
-    motorCost = random3(motor_cost3);
-    escCost = random3(ESC_cost3);
-    propCost = random3(prop_cost3);
-    mcCost = random3(MC_cost3);
+    frameCost = random3([28.78,46.89,145.99,0.35,0.5]);
+    battCost = random3([59.99,79.99,109.99,0.3,0.5]);
+    motorCost = random3([44.99,104.00,199.99,0.3,0.55]);
+    escCost = random3([29.69,32.99,36.99,0.3,0.4]);
+    propCost = random3([3.99,5.69,14.99,0.35,0.45]);
+    mcCost = random3([9.99,13.00,15.00,0.35,0.4]);
     flcCost = random3(FLC_cost3);
     vsCost = random3(VS_cost3);
     navCost = random3(nav_cost3);
     commCost = random3(comm_cost3);
     % calculate unit drone cost
-    DroneCost3(i) = frameCost + battCost + motorCost + escCost + propCost + ...
+    DroneCost3(i) = frameCost + battCost + 4*motorCost + escCost + 4*propCost + ...
      + mcCost + flcCost + vsCost + navCost + commCost;
 end
 
@@ -68,30 +122,45 @@ AveDroneCost3 = mean(DroneCost3); % Average drone design 3 cost
 
 DroneCost4 = zeros(1,k);  % Monte Carlo drone cost for design 4
 for i = 1:k
-    frameCost = random3(frame_cost4);
-    battCost = random3(batt_cost4);
-    motorCost = random3(motor_cost4);
-    escCost = random3(ESC_cost4);
-    propCost = random3(prop_cost4);
-    mcCost = random3(MC_cost4);
+    frameCost = random3([28.78,46.89,145.99,0.35,0.5]);
+    battCost = random3([39.99,59.99,109.99,0.3,0.5]);
+    motorCost = random3([44.99,104.00,199.99,0.3,0.55]);
+    escCost = random3([45.99,50.99,55.99,0.3,0.4]);
+    propCost = random3([3.99,5.69,14.99,0.35,0.45]);
+    mcCost = random3([22.00,24.40,29.99,0.35,0.4]);
     flcCost = random3(FLC_cost4);
     vsCost = random3(VS_cost4);
     navCost = random3(nav_cost4);
     commCost = random3(comm_cost4);
     % calculate unit drone cost
-    DroneCost4(i) = frameCost + battCost + motorCost + escCost + propCost + ...
+    DroneCost4(i) = frameCost + battCost + 4*motorCost + escCost + 4*propCost + ...
      + mcCost + flcCost + vsCost + navCost + commCost;
 end
 
 AveDroneCost4 = mean(DroneCost4); % Average drone design 4 cost
 
+Metric = {'Drone unit cost';'Rated lifting capacity';'Maximum speed'...
+    ;'Maximum flight time'};
+
+Design1 = [AveDroneCost1;LiftCap(1);Vmax(1);FTmax(1)];
+Design2 = [AveDroneCost2;LiftCap(2);Vmax(2);FTmax(2)];
+Design3 = [AveDroneCost3;LiftCap(3);Vmax(3);FTmax(3)];
+Design4 = [AveDroneCost4;LiftCap(4);Vmax(4);FTmax(4)];
+
+% FinTab is a table with the metric values for each design
+FinTab = table(Metric,Design1,Design2,Design3,Design4); 
+
+% writetable(FinTab,'hw11.xlsx','Sheet',1,'Range','A2:G30')
+
+% random3 is a function that substitutes for a probability distribution
+% in generating the random cost variables
 
 function randval = random3(Low,Med,High,pLow,pMed)
 
 % Low is the low cost, Med is the medium cost and High is the high cost 
 % pLow is the probability of getting the low cost
-% pLow is the probability of getting the low cost
-% pLow is the probability of getting the low cost
+% pMed is the probability of getting the medium cost
+% pHigh is the probability of getting the high cost
 
 rand22 = rand;
 if rand22 < pLow
