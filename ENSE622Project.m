@@ -17,7 +17,8 @@ Design4_Weight = [460,7.7*4,83.63*4,230,0,14.4,0.657,7.4,0,0];
 CompWeights = table(Component,Design1_Weight,Design2_Weight,Design3_Weight  ...
  ,Design4_Weight);
 
-DroneWeight = [sum(CompWeights.Design1_Weight),sum(CompWeights.Design2_Weight) ...
+% DroneWeight is in Newton
+DroneWeight = 9.81e-3*[sum(CompWeights.Design1_Weight),sum(CompWeights.Design2_Weight) ...
     ,sum(CompWeights.Design3_Weight),sum(CompWeights.Design4_Weight)];
 
 BattCap = [2.2,3.2,3.2,2.2]; % battery capacity(Ah) of designs 1 - 4
@@ -38,7 +39,7 @@ Afront = (0.45/2)*0.11; % front area of the drone
 Q0 = 0.9; % stall torque (N-m) at rated voltage
 w_nl = 3500; % no load speed (rpm) at rated voltage
 i_nl = 3; % no load current(A)
-Qcons = 0.04; % torque constant (change in torque/change in current)
+Qcons = 0.04; % torque constant (change in torque(N-m)/change in current(A))
 
 wmax = (-(Q0/w_nl)+sqrt((Q0/w_nl)^2 + 4*Aq*Q0))/(2*Aq); % maximum rotational speed
 Tmax = At*wmax^2; % maximum torque 
