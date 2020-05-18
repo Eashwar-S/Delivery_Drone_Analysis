@@ -165,17 +165,17 @@ LiftCapHigh = (Tmax/2) - Drone1WeightLow;  % low end of design 1 rated lifting c
 LiftCapLow = (Tmax/2) - Drone1WeightHigh;  % high end of design 1 rated lifting capacity
 
 % low end of design 1 maximum speed
-VmaxLow = sqrt(2./(CdHigh*1.2*A)) .* (Tmax^2 - Drone1WeightHigh.^2).^0.25;
+VmaxLow = sqrt(2./(CdHigh*1.2*A(1))) .* (Tmax^2 - Drone1WeightHigh.^2).^0.25;
 % high end of design 1 maximum speed
-VmaxHigh = sqrt(2./(CdLow*1.2*A)) .* (Tmax^2 - Drone1WeightLow.^2).^0.25;
+VmaxHigh = sqrt(2./(CdLow*1.2*A(1))) .* (Tmax^2 - Drone1WeightLow.^2).^0.25;
 
-imaxftLow = (sqrt(Drone1WeightLow.^2 + 0.6*CdLow*A*3^2)*Aq/At)/Qcons + i_nl;
-imaxftHigh = (sqrt(Drone1WeightHigh.^2 + 0.6*CdHigh*A*3^2)*Aq/At)/Qcons + i_nl;
+imaxftLow = (sqrt(Drone1WeightLow.^2 + 0.6*CdLow*A(1)*3^2)*Aq/At)/Qcons + i_nl;
+imaxftHigh = (sqrt(Drone1WeightHigh.^2 + 0.6*CdHigh*A(1)*3^2)*Aq/At)/Qcons + i_nl;
 
 % low end of design 1 maximum flight time
-FtmaxLow = BattCap./imaxftHigh;
+FtmaxLow = BattCap(1)./imaxftHigh;
 % high end of design 1 maximum flight time
-FtmaxHigh = BattCap./imaxftLow;
+FtmaxHigh = BattCap(1)./imaxftLow;
 
 % writetable(FinTab,'hw11.xlsx','Sheet',1,'Range','A2:G30')
 
