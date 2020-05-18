@@ -78,7 +78,7 @@ for i = 1:k
      + mcCost + flcCost + vsCost + navCost + commCost;
 end
 AveDroneCost1 = mean(DroneCost); % Average drone design 1 cost
-
+StdDroneCost1 = std(DroneCost); % Standard deviation of drone design 1 cost
 
 DroneCost2 = zeros(1,k);  % Monte Carlo drone cost for design 2
 for i = 1:k
@@ -98,6 +98,7 @@ for i = 1:k
 end
 
 AveDroneCost2 = mean(DroneCost2); % Average drone design 2 cost
+StdDroneCost2 = std(DroneCost2); % Standard deviation of drone design 2 cost
 
 DroneCost3 = zeros(1,k);  % Monte Carlo drone cost for design 3
 for i = 1:k
@@ -117,6 +118,7 @@ for i = 1:k
 end
 
 AveDroneCost3 = mean(DroneCost3); % Average drone design 3 cost
+StdDroneCost3 = std(DroneCost3); % Standard deviation of drone design 3 cost
 
 
 DroneCost4 = zeros(1,k);  % Monte Carlo drone cost for design 4
@@ -137,6 +139,7 @@ for i = 1:k
 end
 
 AveDroneCost4 = mean(DroneCost4); % Average drone design 4 cost
+StdDroneCost4 = std(DroneCost4); % Standard deviation of drone design 4 cost
 
 Metric = {'Drone unit cost($)';'Rated lifting capacity(N)';'Maximum speed(m/s)'...
     ;'Maximum flight time(hour)'};
