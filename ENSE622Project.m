@@ -25,17 +25,15 @@ BattCap = [2.2,3.2,3.2,2.2]; % battery capacity(Ah) of designs 1 - 4
 
 % Response Equations 
 
-Cq = 0.002; % torque coefficient
 % single motor Torque, Q(N-m) = Aq*w^2 where w is angular speed(rpm)
-Aq = (0.5*Cq*1.2*0.1016^5*pi);
+Aq = 2e-9;
 
-Ct = 0.016; % thrust coefficient
 % drone Thrust, T(N) = At*w^2 where w is angular speed(rpm)
-At = (0.5*Ct*1.2*0.1016^4*pi)*4;  % 4 is for 4 motors
+At = 8e-7*4;  % 4 is for 4 motors
 Cd = 0.04; % drag coefficient Drag = 0.5*Cd*1.2*A*V^2 where v is drone speed
 
-Atop = pi*0.45^2/4; % top area of the drone
-Afront = (0.45/2)*0.11; % front area of the drone
+Atop = pi*0.45^2/4; % top area of the drone in meter square
+Afront = (0.45/2)*0.11; % front area of the drone in meter square
 Q0 = 0.9; % stall torque (N-m) at rated voltage
 w_nl = 3500; % no load speed (rpm) at rated voltage
 i_nl = 3; % no load current(A)
@@ -140,8 +138,8 @@ end
 
 AveDroneCost4 = mean(DroneCost4); % Average drone design 4 cost
 
-Metric = {'Drone unit cost';'Rated lifting capacity';'Maximum speed'...
-    ;'Maximum flight time'};
+Metric = {'Drone unit cost($)';'Rated lifting capacity(N)';'Maximum speed(m/s)'...
+    ;'Maximum flight time(hour)'};
 
 Design1 = [AveDroneCost1;LiftCap(1);Vmax(1);Ftmax(1)];
 Design2 = [AveDroneCost2;LiftCap(2);Vmax(2);Ftmax(2)];
