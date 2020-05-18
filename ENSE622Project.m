@@ -68,6 +68,7 @@ Ftmax = BattCap./imaxft;
 k = 2000; % number of Monte Carlo trials
 
 DroneCost = zeros(1,k);  % Monte Carlo drone cost for design 1
+CRMCost = zeros(1,k); % Cumulative running mean of the drone cost for design 1
 for i = 1:k
     frameCost = random3(28.78,46.89,145.99,0.35,0.5); % per unit cost of drone frame
     battCost = random3(39.99,59.99,109.99,0.3,0.5); % per unit cost of battery
@@ -82,12 +83,18 @@ for i = 1:k
     % calculate unit drone cost
     DroneCost(i) = frameCost + battCost + 4*motorCost + escCost + 4*propCost + ...
      + mcCost + flcCost + vsCost + navCost + commCost;
+    if i == 1
+        CRMCost(i) = DroneCost(i);
+    else
+        CRMCost(i) = ((i-1)*CRMCost(i-1)+DroneCost(i))/i;
+    end
 end
 AveDroneCost1 = mean(DroneCost); % Average drone design 1 cost
 StdDroneCost1 = std(DroneCost); % Standard deviation of drone design 1 cost
 SEDroneCost1 = StdDroneCost1/sqrt(k); % Standard error of the average drone design 1 cost
 
 DroneCost2 = zeros(1,k);  % Monte Carlo drone cost for design 2
+CRMCost2 = zeros(1,k); % Cumulative running mean of the drone cost for design 2
 for i = 1:k
     frameCost = random3(28.78,46.89,145.99,0.35,0.5);
     battCost = random3(59.99,79.99,109.99,0.3,0.5);
@@ -102,6 +109,11 @@ for i = 1:k
     % calculate unit drone cost
     DroneCost2(i) = frameCost + battCost + 4*motorCost + escCost + 4*propCost + ...
      + mcCost + flcCost + vsCost + navCost + commCost;
+    if i == 1
+        CRMCost2(i) = DroneCost2(i);
+    else
+        CRMCost2(i) = ((i-1)*CRMCost2(i-1)+DroneCost2(i))/i;
+    end
 end
 
 AveDroneCost2 = mean(DroneCost2); % Average drone design 2 cost
@@ -109,6 +121,7 @@ StdDroneCost2 = std(DroneCost2); % Standard deviation of drone design 2 cost
 SEDroneCost2 = StdDroneCost2/sqrt(k); % Standard error of the average drone design 2 cost
 
 DroneCost3 = zeros(1,k);  % Monte Carlo drone cost for design 3
+CRMCost3 = zeros(1,k); % Cumulative running mean of the drone cost for design 3
 for i = 1:k
     frameCost = random3(28.78,46.89,145.99,0.35,0.5);
     battCost = random3(59.99,79.99,109.99,0.3,0.5);
@@ -123,6 +136,11 @@ for i = 1:k
     % calculate unit drone cost
     DroneCost3(i) = frameCost + battCost + 4*motorCost + escCost + 4*propCost + ...
      + mcCost + flcCost + vsCost + navCost + commCost;
+    if i == 1
+        CRMCost3(i) = DroneCost3(i);
+    else
+        CRMCost3(i) = ((i-1)*CRMCost3(i-1)+DroneCost3(i))/i;
+    end
 end
 
 AveDroneCost3 = mean(DroneCost3); % Average drone design 3 cost
@@ -131,6 +149,8 @@ SEDroneCost3 = StdDroneCost3/sqrt(k); % Standard error of the average drone desi
 
 
 DroneCost4 = zeros(1,k);  % Monte Carlo drone cost for design 4
+CRMCost4 = zeros(1,k); % Cumulative running mean of the drone cost for design 1
+
 for i = 1:k
     frameCost = random3(28.78,46.89,145.99,0.35,0.5);
     battCost = random3(39.99,59.99,109.99,0.3,0.5);
@@ -145,6 +165,11 @@ for i = 1:k
     % calculate unit drone cost
     DroneCost4(i) = frameCost + battCost + 4*motorCost + escCost + 4*propCost + ...
      + mcCost + flcCost + vsCost + navCost + commCost;
+    if i == 1
+        CRMCost4(i) = DroneCost4(i);
+    else
+        CRMCost4(i) = ((i-1)*CRMCost4(i-1)+DroneCost4(i))/i;
+    end
 end
 
 AveDroneCost4 = mean(DroneCost4); % Average drone design 4 cost
@@ -181,7 +206,11 @@ FtmaxLow = BattCap(1)./imaxftHigh;
 % high end of design 1 maximum flight time
 FtmaxHigh = BattCap(1)./imaxftLow;
 
-% writetable(FinTab,'hw11.xlsx','Sheet',1,'Range','A2:G30')
+plot(1:k,CRMCost,1:k,CRMCost2,1:k,CRMCost3,1:k,CRMCost4)
+legend('Design 1','Design 2','Design 3','Design 4')
+xlabel('count')
+ylabel('cumulative running mean')
+title('cumulative running mean of the costs of the drone designs')
 
 % random3 is a function that substitutes for a probability distribution
 % in generating the random cost variables
