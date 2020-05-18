@@ -17,9 +17,10 @@ Design4_Weight = [460,7.7*4,83.63*4,230,16.4,14.4,0.657,7.4,20.68,390]';
 CompWeights = table(Component,Design1_Weight,Design2_Weight,Design3_Weight  ...
  ,Design4_Weight);
 
-% DroneWeight is in Newton
+% DroneWeight is in Newton 1.1 accounts for other components like wires, 
+% package holder, propeller guard that are not included in system description
 DroneWeight = 9.81e-3*[sum(CompWeights.Design1_Weight),sum(CompWeights.Design2_Weight) ...
-    ,sum(CompWeights.Design3_Weight),sum(CompWeights.Design4_Weight)];
+    ,sum(CompWeights.Design3_Weight),sum(CompWeights.Design4_Weight)]*1.1;
 
 BattCap = [2.2,3.2,3.2,2.2]; % battery capacity(Ah) of designs 1 - 4
 
@@ -31,7 +32,8 @@ Aq = 2e-9;
 % drone Thrust, T(N) = At*w^2 where w is angular speed(rpm)
 At = 8e-7*4;  % 4 is for 4 motors
 Cd = 0.04; % drag coefficient Drag = 0.5*Cd*1.2*A*V^2 where v is drone speed
-
+CdLow = 0.04-0.0035;
+CdHigh = 0.04 + 0.0035;
 Atop = pi*0.45^2/4; % top area of the drone in meter square
 Afront = (0.45/2)*0.11; % front area of the drone in meter square
 Q0 = 0.9; % stall torque (N-m) at rated voltage
@@ -47,6 +49,7 @@ Tmax = At*wmax^2; % maximum torque
 % rated lifting capacity, LiftCap (in N)
 LiftCap = (Tmax/2) - DroneWeight; %thrust-to-weight ratio of 2
 
+
 % maximum speed, Vmax (in m/s)
 A = (Atop*sqrt(Tmax^2 - DroneWeight.^2) + Afront*DroneWeight)/Tmax; % drone frontal area
 Vmax = sqrt(2./(Cd*1.2*A)) .* (Tmax^2 - DroneWeight.^2).^0.25;
@@ -55,7 +58,10 @@ Vmax = sqrt(2./(Cd*1.2*A)) .* (Tmax^2 - DroneWeight.^2).^0.25;
 
 % current drawn by motor at maximum flight time condition
 imaxft = (sqrt(DroneWeight.^2 + 0.6*Cd*A*3^2)*Aq/At)/Qcons + i_nl;
+
 Ftmax = BattCap./imaxft; 
+
+
 
 % Monte Carlo simulation
 
@@ -151,6 +157,25 @@ Design4 = [AveDroneCost4;LiftCap(4);Vmax(4);Ftmax(4)];
 
 % FinTab is a table with the metric values for each design
 FinTab = table(Metric,Design1,Design2,Design3,Design4); 
+
+Drone1WeightLow = DroneWeight(1)*1.05/1.1;  % low end of design 1 drone weight
+Drone1WeightHigh = DroneWeight(1)*1.15/1.1;  % high end of design 1 drone weight
+
+LiftCapHigh = (Tmax/2) - Drone1WeightLow;  % low end of design 1 rated lifting capacity
+LiftCapLow = (Tmax/2) - Drone1WeightHigh;  % high end of design 1 rated lifting capacity
+
+% low end of design 1 maximum speed
+VmaxLow = sqrt(2./(CdHigh*1.2*A)) .* (Tmax^2 - Drone1WeightHigh.^2).^0.25;
+% high end of design 1 maximum speed
+VmaxHigh = sqrt(2./(CdLow*1.2*A)) .* (Tmax^2 - Drone1WeightLow.^2).^0.25;
+
+imaxftLow = (sqrt(Drone1WeightLow.^2 + 0.6*CdLow*A*3^2)*Aq/At)/Qcons + i_nl;
+imaxftHigh = (sqrt(Drone1WeightHigh.^2 + 0.6*CdHigh*A*3^2)*Aq/At)/Qcons + i_nl;
+
+% low end of design 1 maximum flight time
+FtmaxLow = BattCap./imaxftHigh;
+% high end of design 1 maximum flight time
+FtmaxHigh = BattCap./imaxftLow;
 
 % writetable(FinTab,'hw11.xlsx','Sheet',1,'Range','A2:G30')
 
