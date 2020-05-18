@@ -209,7 +209,7 @@ FtmaxHigh = BattCap(1)./imaxftLow;
 plot(1:k,CRMCost,1:k,CRMCost2,1:k,CRMCost3,1:k,CRMCost4)
 legend('Design 1','Design 2','Design 3','Design 4')
 xlabel('count')
-ylabel('cumulative running mean')
+ylabel('cumulative running mean, $')
 title('cumulative running mean of the costs of the drone designs')
 
 % random3 is a function that substitutes for a probability distribution
